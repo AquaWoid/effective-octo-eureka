@@ -69,8 +69,8 @@ public class Movement : MonoBehaviour
             }
 
         }
- 
 
+        animationUpdate();
     }
 
     void animationUpdate()
