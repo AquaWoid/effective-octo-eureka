@@ -13,10 +13,6 @@ public class Movement : MonoBehaviour
 
     float block = 1f;
 
-    float dashSpeed = 40f;
-
-    bool dashed = false;
-    bool dashCounterTriggered = false;
 
     Rigidbody2D rb;
 
@@ -38,37 +34,36 @@ public class Movement : MonoBehaviour
     void Update()
     {
 
+        
+
         horizontalMove = Input.GetAxisRaw("Horizontal") * speed;
         verticalMove = Input.GetAxisRaw("Vertical") * speed;
 
         combinedSpeed = (speed * block);
 
-        if (Input.GetButton("Fire1"))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-           if(dashed == false)
-            {
-                combinedSpeed *= dashSpeed;
-                dashed = true;
-                dashCounterTriggered = true;
-            }
 
-            print("Dashed!!!!");
+
+            anim.SetBool("Attacking", true);
+
+            print("Attacked!!!!");
+
+
+            StartCoroutine(attackDelay());
+
 
         }
 
-        if(dashCounterTriggered == true)
+        IEnumerator attackDelay()
         {
-
-            dashCooldown -= Time.deltaTime;
-
-            if(dashCooldown <= 0)
-            {
-                dashCooldown = 4;
-                dashed = false;
-                dashCounterTriggered = false;
-            }
+            yield return new WaitForSeconds(1);
+            anim.SetBool("Attacking", false);
+           // print("Set bool to false");
 
         }
+
+
 
         animationUpdate();
     }
