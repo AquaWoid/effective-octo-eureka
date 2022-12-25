@@ -12,7 +12,6 @@ public class EnemyAI : MonoBehaviour
     Text DamageText;
 
 
-
     public float level = 1;
 
     public float hp = 100;
@@ -166,39 +165,23 @@ public class EnemyAI : MonoBehaviour
     IEnumerator move ()
     {
 
-      
-
             CoroutineState = 1;
             MoveRight();
-            print("right");
             yield return new WaitForSeconds(walkDistance);
-
-
 
 
             CoroutineState = 2;
             MoveDown();
-            print("down");
             yield return new WaitForSeconds(walkDistance);
-
-
-
 
             CoroutineState = 3;
             MoveLeft();
-            print("left");
             yield return new WaitForSeconds(walkDistance);
-
-
-
-
 
             CoroutineState = 4;
             MoveUp();
-            print("up");
             yield return new WaitForSeconds(walkDistance);
-
-        
+       
 
         StartCoroutine(move());
     }

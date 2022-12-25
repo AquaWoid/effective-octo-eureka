@@ -7,7 +7,7 @@ public class EnemyDetectionRadius : MonoBehaviour
 
     PlayerStats playerStats;
 
-    bool isAttacking = false;
+    bool localAttack = false;
     Animator animator;
 
     EnemyAI enemyAi;
@@ -27,7 +27,7 @@ public class EnemyDetectionRadius : MonoBehaviour
 
     private void attack()
     {
-        if (isAttacking == false)
+        if(localAttack == false)
         {
             StartCoroutine(attackDelay());
         }
@@ -35,7 +35,9 @@ public class EnemyDetectionRadius : MonoBehaviour
 
     IEnumerator attackDelay()
     {
-        isAttacking = true;
+
+        localAttack = true;
+
         yield return new WaitForSeconds(0.5f);
 
 
@@ -54,11 +56,17 @@ public class EnemyDetectionRadius : MonoBehaviour
             }
         }
 
-        isAttacking = false;
+
+        localAttack = false;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+
+        if(collision.tag == "Arrow")
+        {
+            Destroy(collision.gameObject);
+        }
 
         if (collision.tag == "Player")
         {
@@ -75,10 +83,13 @@ public class EnemyDetectionRadius : MonoBehaviour
     private void OnTriggerExit2D(Collider2D collision)
     {
 
-        enemyAi.unsetAttacking();
+
 
         if (collision.tag == "Player")
         {
+            enemyAi.unsetAttacking();
+
+
             transform.GetComponent<SpriteRenderer>().color = new Vector4(0, 255, 0, 50);
             playerStats = null;
             animator.SetBool("Attacking", false);
@@ -88,7 +99,12 @@ public class EnemyDetectionRadius : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        print("staying on trigger");
-        attack();
+
+        if(collision.tag == "Player")
+        {
+           attack();
+            Debug.Log("Staying on trigger");
+        }
+
     }
 }

@@ -79,21 +79,22 @@ public class Movement : MonoBehaviour
             anim.SetBool("Idle", false);
         }
 
+        // LEFT
         if (Input.GetAxisRaw("Horizontal") == -1)
         {
             anim.SetFloat("Blend", 0);
         }
-
+        // RIGHT
         if (Input.GetAxisRaw("Horizontal") == 1)
         {
             anim.SetFloat("Blend", 0.66f);
         }
-
+        // DOWN
         if (Input.GetAxisRaw("Vertical") == -1)
         {
             anim.SetFloat("Blend", 1);
         }
-
+        // UP
         if (Input.GetAxisRaw("Vertical") == 1)
         {
             anim.SetFloat("Blend", 0.33f);

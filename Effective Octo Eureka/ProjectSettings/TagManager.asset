@@ -3,7 +3,14 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Arrow
+  - NPC
+  - IgnoreCollision
+  - DetectionRight
+  - DetectionLeft
+  - DetectionUp
+  - DetectionDown
   layers:
   - Default
   - TransparentFX
