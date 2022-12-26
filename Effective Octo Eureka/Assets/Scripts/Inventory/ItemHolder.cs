@@ -42,30 +42,23 @@ public class ItemHolder : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        /*
-                title_text = transform.GetChild(1).GetComponent<Text>();
-                baseDamage_text = transform.GetChild(4).GetComponent<Text>();
-                critChance_text = transform.GetChild(5).GetComponent<Text>();
-                prefix1ID_text = transform.GetChild(6).GetComponent<Text>();
-                prefix2ID_text = transform.GetChild(7).GetComponent<Text>();
-                suffix1ID_text = transform.GetChild(8).GetComponent<Text>();
-                suffix2ID_text = transform.GetChild(9).GetComponent<Text>();
-                craftedID_text = transform.GetChild(10).GetComponent<Text>();
 
-        */
+        playerStats = transform.parent.parent.parent.parent.parent.parent.GetComponent<PlayerStats>();
 
 
-        playerStats = transform.parent.parent.parent.parent.GetComponent<PlayerStats>();
+        //Description text reference - Indexed Reference -> not optimal! may be switching to a singleton reference schema
 
-        title_text = transform.parent.parent.GetChild(1).GetChild(0).GetComponent<Text>(); 
-        baseDamage_text = transform.parent.parent.GetChild(1).GetChild(1).GetComponent<Text>();
-        critChance_text = transform.parent.parent.GetChild(1).GetChild(2).GetComponent<Text>();
-        prefix1ID_text = transform.parent.parent.GetChild(1).GetChild(3).GetComponent<Text>();
-        prefix2ID_text = transform.parent.parent.GetChild(1).GetChild(4).GetComponent<Text>();
-        suffix1ID_text = transform.parent.parent.GetChild(1).GetChild(5).GetComponent<Text>();
-        suffix2ID_text = transform.parent.parent.GetChild(1).GetChild(6).GetComponent<Text>();
-        craftedID_text = transform.parent.parent.GetChild(1).GetChild(7).GetComponent<Text>();
+        title_text = transform.parent.parent.parent.parent.GetChild(0).GetChild(0).GetComponent<Text>(); 
+        baseDamage_text = transform.parent.parent.parent.parent.GetChild(0).GetChild(1).GetComponent<Text>();
+        critChance_text = transform.parent.parent.parent.parent.GetChild(0).GetChild(2).GetComponent<Text>();
+        prefix1ID_text = transform.parent.parent.parent.parent.GetChild(0).GetChild(3).GetComponent<Text>();
+        prefix2ID_text = transform.parent.parent.parent.parent.GetChild(0).GetChild(4).GetComponent<Text>();
+        suffix1ID_text = transform.parent.parent.parent.parent.GetChild(0).GetChild(5).GetComponent<Text>();
+        suffix2ID_text = transform.parent.parent.parent.parent.GetChild(0).GetChild(6).GetComponent<Text>();
+        craftedID_text = transform.parent.parent.parent.parent.GetChild(0).GetChild(7).GetComponent<Text>();
 
+
+        //Stat text init
         baseDamage_text.text = "";
         critChance_text.text = "";
         prefix1ID_text.text = "";
@@ -84,6 +77,7 @@ public class ItemHolder : MonoBehaviour
 
     }
 
+    //Main function to update item Stats from external classes
     public void updateInventoryEntries(Item item)
     {
         id = item.id;
@@ -96,23 +90,10 @@ public class ItemHolder : MonoBehaviour
         suffix2ID = item.suffix2ID;
         craftedID = item.craftedID;
 
-
-        
-        //  title_text.text = title;
-
-        /*
-        title_text.text = title;
-        baseDamage_text.text = "Damage: " + baseDamage.ToString();
-        critChance_text.text = "Crit chance: " + critChance.ToString();
-        prefix1ID_text.text = "Prefix 1 ID: " + prefix1ID.ToString();
-        prefix2ID_text.text = "Prefix 2 ID: " + prefix2ID.ToString();
-        suffix1ID_text.text = "Suffix 1 ID: " + suffix1ID.ToString();
-        suffix2ID_text.text = "Suffix 2 ID: " + suffix2ID.ToString();
-        craftedID_text.text = "Crafted ID " + craftedID.ToString();
-        */
     }
 
 
+    //Stat show hover event
     public void enableStats()
     {
         switch (prefix1ID)
@@ -218,23 +199,12 @@ public class ItemHolder : MonoBehaviour
         title_text.text = title;
         baseDamage_text.text = "Damage: " + baseDamage.ToString();
         critChance_text.text = "Crit chance: " + critChance.ToString();
-     //   prefix1ID_text.text = "Prefix 1 ID: " + prefix1ID.ToString();
-     //   prefix2ID_text.text = "Prefix 2 ID: " + prefix2ID.ToString();
-    //    suffix1ID_text.text = "Suffix 1 ID: " + suffix1ID.ToString();
-     //   suffix2ID_text.text = "Suffix 2 ID: " + suffix2ID.ToString();
-        craftedID_text.text = "Crafted ID " + craftedID.ToString();
+        craftedID_text.text = "Unique ID " + id.ToString();
 
-        /*
-        baseDamage_text.enabled = true;
-        critChance_text.enabled = true;
-        prefix1ID_text.enabled = true;
-        prefix2ID_text.enabled = true;
-        suffix1ID_text.enabled = true;
-        suffix2ID_text.enabled = true;
-        craftedID_text.enabled = true;
-        */
+
     }
 
+    //Stat hide hover event
     public void disableStats()
     {
         title_text.text = "";
@@ -248,6 +218,7 @@ public class ItemHolder : MonoBehaviour
 
     }
 
+    //Delete item  -> also deletes from the Inventory DB
     public void Scrap()
     {
 
@@ -255,5 +226,11 @@ public class ItemHolder : MonoBehaviour
 
         playerStats.ScrapItem(id);
         Destroy(gameObject);
+    }
+
+    //Equip function -> Work in progress
+    public void Equip()
+    {
+        print("Equipped: " + this.name);
     }
 }

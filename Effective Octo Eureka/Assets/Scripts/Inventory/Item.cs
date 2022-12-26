@@ -22,7 +22,7 @@ public class Item
 
 
 
-
+    //Item Base 
 
     public Item(int id, string title,  int damage, float crit, int prefix1, int prefix2, int suffix1, int suffix2, int crafted)
     {

@@ -74,7 +74,7 @@ public class NpcEvadeObstacles : MonoBehaviour
             //obtacle from left
             if (rotationState == 0)
             {
-                print("Obstacle from left");
+             //   print("Obstacle from left");
 
                 //if facing down
                 if (behavior.OrientationRotation == 1)
@@ -116,7 +116,7 @@ public class NpcEvadeObstacles : MonoBehaviour
             //obtacle from  down
             if (rotationState == 1)
             {
-                print("Obstacle from down");
+              //  print("Obstacle from down");
                 //if facing down
                 if (behavior.OrientationRotation == 1)
                 {
@@ -152,7 +152,7 @@ public class NpcEvadeObstacles : MonoBehaviour
             //obtacle from  right
             if (rotationState == 2)
             {
-                print("Obstacle from right");
+              //  print("Obstacle from right");
                 //if facing down
                 if (behavior.OrientationRotation == 1)
                 {
@@ -190,7 +190,7 @@ public class NpcEvadeObstacles : MonoBehaviour
             //obtacle from  up
             if (rotationState == 3)
             {
-                print("Obstacle from up");
+               // print("Obstacle from up");
                 //if facing down
                 if (behavior.OrientationRotation == 1)
                 {

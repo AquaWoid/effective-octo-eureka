@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 
 
 
@@ -53,11 +54,9 @@ public class PlayerStats : MonoBehaviour
     private void Start()
     {
 
-      //  inventoryGrid = transform.GetChild(0).GetChild(12).GetChild(0);
         int count = 0;
-     //   iHolder = transform.GetChild(0).GetChild(12).GetChild(0).GetComponent<ItemHolder>();
 
-        
+        //Declaration of UI Text childs
         foreach (Transform child in transform)
         {
             if(child.name == "Canvas")
@@ -74,7 +73,7 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
-
+    // Safe Function - Linked to the Save System
     public void SaveGame()
     {
 
@@ -82,8 +81,12 @@ public class PlayerStats : MonoBehaviour
 
     }
 
+    //Load Function - Linked to the Save System
     public void LoadGame()
     {
+
+
+        //Loading data from Save file 
 
         PlayerData data = SaveSystem.LoadPlayer();
 
@@ -92,9 +95,6 @@ public class PlayerStats : MonoBehaviour
         xp = data.exp;
         requieredXP = data.xpneeded;
         transform.position = new Vector3(data.position[0], data.position[1], data.position[2]);
-
-
-
         PhysicalDamage = data.PhysicalDamage;
         MagicalDamage = data.MagicalDamage;
 
@@ -104,25 +104,25 @@ public class PlayerStats : MonoBehaviour
         MovementSpeed = data.MovementSpeed;
         Inventory = data.Inventory;
 
-        /*
-        foreach (GameObject child in inventoryGrid.transform)
-        {
-            Destroy(child.gameObject);
-        }
-        */
 
+
+        //Clear inventory window of any items before applying current Inventory
         foreach (Transform child in inventoryGrid.transform)
         {
             print("Scrapped: " + child.name);
             Destroy(child.gameObject);
         }
 
+
+        //Instantiate item Holders based on our saved inventory List
         foreach (Item item in Inventory)
         {
             print("ID: " + item.id + " | Title: " + item.title + " | Damage: " + item.baseDamage + " | Crit: " + item.critChance +
                 " | Prefix 1: " + item.prefix1ID + " | Prefix 2: " + item.prefix2ID + " | Suffix 1: " + item.suffix1ID + " | Suffix 2: " + item.suffix2ID + " | Crafted: " + item.craftedID);
 
-              GameObject go = Instantiate(itemHolderGO, transform.GetChild(0).GetChild(12).GetChild(0));
+
+            //  GameObject go = Instantiate(itemHolderGO, transform.GetChild(0).GetChild(12).GetChild(0));
+            GameObject go = Instantiate(itemHolderGO, inventoryGrid.transform);
             go.GetComponent<ItemHolder>().updateInventoryEntries(item);
 
             print("Applied: " + item.title + " to: " + go.name);
@@ -134,6 +134,8 @@ public class PlayerStats : MonoBehaviour
     }
     private void Update()
     {
+
+        //Debug Key triggers
 
          rnd = Random.Range(1, 8);
       //  print(rnd);
@@ -162,6 +164,8 @@ public class PlayerStats : MonoBehaviour
 
         }
 
+
+        //Player Stats update
         UiText[0].text = "Level " + level;
         UiText[1].text = "Health " + health;
         UiText[2].text = "Experience " + xp;
@@ -173,12 +177,13 @@ public class PlayerStats : MonoBehaviour
         UiText[8].text = "Movement Speed " + MovementSpeed;
         UiText[9].text = "Gold " + Gold;
 
+        //Level up condition
         if (requieredXP <= 0)
         {
             levelUp();
         }
 
-
+        //Knockback condition
         if(knockedBack == true)
         {
             transform.Translate(Mathf.Lerp(0, -2, Time.deltaTime), 0, 0);
@@ -187,7 +192,7 @@ public class PlayerStats : MonoBehaviour
 
     }
 
-
+    //Knockback coroutine
     IEnumerator knockback()
     {
         knockedBack = true;
@@ -195,6 +200,8 @@ public class PlayerStats : MonoBehaviour
         knockedBack = false;
     }
 
+
+    //Damage income function
     public void takeDamage(int damage)
     {
         health -= damage;
@@ -203,6 +210,8 @@ public class PlayerStats : MonoBehaviour
 
     }
 
+
+    //Level up function
     void levelUp()
     {
         requieredXP = lastRequiered * 2;
@@ -222,11 +231,15 @@ public class PlayerStats : MonoBehaviour
     }
 
 
-    public void AddItem()
+    //Loot item to inventory function -> Work in progress
+    public void LootItem(Item externalItem)
     {
 
+    }
 
-
+    //Add item to inventory function
+    public void AddItem()
+    {
 
         string titleStr = "";
 
@@ -260,11 +273,39 @@ public class PlayerStats : MonoBehaviour
             titleStr = "Looter's";
         }
 
-        Inventory.Add(new Item(Inventory.Count + 1, titleStr,  rnd*20, rnd*10, rnd, rnd, rnd, rnd, 0));
-
-      //  Inventory.Add(new Item(Inventory.Count + 1, titleStr,  10, 50, rnd, rnd, rnd, rnd, 0));
 
 
+        //Random ID and Stat generation
+        int randomID = Random.Range(1000, 9999);
+        int rndPre1 = Random.Range(1, 8);
+        int rndPre2 = Random.Range(1, 8);
+        int rndSuf1 = Random.Range(1, 8);
+        int rndSuf2 = Random.Range(1, 8);
+
+
+
+        //Checks if the ID is already in our inventory, if not adds an item -> if already in inventory, rerolls ID until not in inventory
+        var found = Inventory.Find(Item => Item.id == randomID);
+        if (found == null)
+        {
+
+            Item addedItem = new Item(randomID, titleStr, rnd * 20, rnd * 10, rndPre1, rndPre2, rndSuf1, rndSuf2, 0);
+
+            Inventory.Add(addedItem);
+
+            GameObject go = Instantiate(itemHolderGO, inventoryGrid.transform);
+            go.GetComponent<ItemHolder>().updateInventoryEntries(addedItem);
+
+        }
+        else
+        {
+            Debug.LogError("Error: Unique ID already present");
+            AddItem();
+        }
+
+
+
+        //DEBUG: Show current inventory items
         foreach (Item item in Inventory)
         {
             print("ID: " + item.id + " | Title: " + item.title + " | Damage: " + item.baseDamage + " | Crit: " + item.critChance +
@@ -272,6 +313,7 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
+    //Item deletion function
     public void ScrapItem(int id_)
     {
         print("Inventory Size: " + Inventory.Count);
@@ -282,6 +324,29 @@ public class PlayerStats : MonoBehaviour
         {
             Inventory.Remove(found);
         }
+    }
+
+    //Inventory Sorting function -> Work in Progress
+    public void SortInventory()
+    {
+        Inventory = Inventory.OrderBy(Item => Item.baseDamage).ToList();
+
+
+        foreach (Transform child in inventoryGrid.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        foreach (Item item in Inventory)
+        {
+
+            GameObject go = Instantiate(itemHolderGO, inventoryGrid.transform);
+            go.GetComponent<ItemHolder>().updateInventoryEntries(item);
+
+            print("Sorted by Base Damage");
+
+        }
+
     }
 
 }
