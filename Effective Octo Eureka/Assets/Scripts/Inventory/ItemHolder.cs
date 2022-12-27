@@ -45,17 +45,20 @@ public class ItemHolder : MonoBehaviour
 
         playerStats = transform.parent.parent.parent.parent.parent.parent.GetComponent<PlayerStats>();
 
+        playerStats = ObjectReferences.instance.Player.GetComponent<PlayerStats>();
 
         //Description text reference - Indexed Reference -> not optimal! may be switching to a singleton reference schema
 
-        title_text = transform.parent.parent.parent.parent.GetChild(0).GetChild(0).GetComponent<Text>(); 
-        baseDamage_text = transform.parent.parent.parent.parent.GetChild(0).GetChild(1).GetComponent<Text>();
-        critChance_text = transform.parent.parent.parent.parent.GetChild(0).GetChild(2).GetComponent<Text>();
-        prefix1ID_text = transform.parent.parent.parent.parent.GetChild(0).GetChild(3).GetComponent<Text>();
-        prefix2ID_text = transform.parent.parent.parent.parent.GetChild(0).GetChild(4).GetComponent<Text>();
-        suffix1ID_text = transform.parent.parent.parent.parent.GetChild(0).GetChild(5).GetComponent<Text>();
-        suffix2ID_text = transform.parent.parent.parent.parent.GetChild(0).GetChild(6).GetComponent<Text>();
-        craftedID_text = transform.parent.parent.parent.parent.GetChild(0).GetChild(7).GetComponent<Text>();
+        Transform stats = ObjectReferences.instance.InventoryStats.transform;
+
+        title_text = stats.GetChild(0).GetComponent<Text>();
+        baseDamage_text = stats.GetChild(1).GetComponent<Text>();
+        critChance_text = stats.GetChild(2).GetComponent<Text>();
+        prefix1ID_text = stats.GetChild(3).GetComponent<Text>();
+        prefix2ID_text = stats.GetChild(4).GetComponent<Text>();
+        suffix1ID_text = stats.GetChild(5).GetComponent<Text>();
+        suffix2ID_text = stats.GetChild(6).GetComponent<Text>();
+        craftedID_text = stats.GetChild(7).GetComponent<Text>();
 
 
         //Stat text init
@@ -231,6 +234,11 @@ public class ItemHolder : MonoBehaviour
     //Equip function -> Work in progress
     public void Equip()
     {
+
+        Item i = new Item(id, title, baseDamage, critChance, prefix1ID, prefix2ID, suffix1ID, suffix2ID, craftedID);
+
+        playerStats.EquipItem(i);
+
         print("Equipped: " + this.name);
     }
 }

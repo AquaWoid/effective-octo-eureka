@@ -20,6 +20,8 @@ public class EnemyAI : MonoBehaviour
 
     public float t;
 
+    int rotationState;
+
     bool isBleeding = false;
 
     [SerializeField]
@@ -91,7 +93,9 @@ public class EnemyAI : MonoBehaviour
 
         if (State == EnemyStates.attacking)
         {
-           
+
+
+
             /*
             if(Player.transform.position.x < transform.position.x - 5)
             {
@@ -246,4 +250,33 @@ public class EnemyAI : MonoBehaviour
         yield return new WaitForSeconds(4);
         isBleeding = false;
     }
+
+    public void rotateToObject(int OrientationRotation)
+    {
+
+
+        if (OrientationRotation == 0)
+        {
+
+            animator.SetFloat("Blend", 0);
+        }
+        if (OrientationRotation == 1)
+        {
+
+            animator.SetFloat("Blend", 1);
+        }
+        if (OrientationRotation == 2)
+        {
+
+            animator.SetFloat("Blend", 0.66f);
+        }
+        if (OrientationRotation == 3)
+        {
+
+            animator.SetFloat("Blend", 0.33f);
+        }
+
+
+    }
+
 }

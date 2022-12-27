@@ -327,7 +327,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2612494931948392818}
         m_TargetAssemblyTypeName: ItemHolder, Assembly-CSharp
-        m_MethodName: Scrap
+        m_MethodName: Equip
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

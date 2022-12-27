@@ -44,6 +44,10 @@ public class PlayerStats : MonoBehaviour
 
     public Transform inventoryGrid;
 
+    public Slider[] hudSlider;
+
+    Canvas canvas;
+
     private void Awake()
     {
         lastRequiered = requieredXP;
@@ -54,6 +58,10 @@ public class PlayerStats : MonoBehaviour
     private void Start()
     {
 
+        hudSlider[0].maxValue = health;
+        hudSlider[2].maxValue = requieredXP;
+
+        canvas = transform.GetChild(0).GetComponent<Canvas>();
         int count = 0;
 
         //Declaration of UI Text childs
@@ -135,6 +143,10 @@ public class PlayerStats : MonoBehaviour
     private void Update()
     {
 
+
+        hudSlider[0].value = health;
+        hudSlider[2].value = xp;
+
         //Debug Key triggers
 
          rnd = Random.Range(1, 8);
@@ -144,6 +156,7 @@ public class PlayerStats : MonoBehaviour
         {
             xp += 1000;
             requieredXP -= 1000;
+
             Inventory.Clear();
             AddItem();
 
@@ -157,9 +170,15 @@ public class PlayerStats : MonoBehaviour
 
         }
 
-        if (Input.GetKeyDown(KeyCode.Z))
+        if (Input.GetKeyDown(KeyCode.I))
         {
-
+            if(canvas.enabled == true)
+            {
+                canvas.enabled = false;
+            }else
+            {
+                canvas.enabled = true;
+            }
 
 
         }
@@ -205,7 +224,7 @@ public class PlayerStats : MonoBehaviour
     public void takeDamage(int damage)
     {
         health -= damage;
-        StartCoroutine(knockback());
+     //   StartCoroutine(knockback());
 
 
     }
@@ -216,6 +235,8 @@ public class PlayerStats : MonoBehaviour
     {
         requieredXP = lastRequiered * 2;
         lastRequiered = requieredXP;
+
+        hudSlider[2].maxValue = requieredXP;
 
         xp = 0;
 
@@ -347,6 +368,11 @@ public class PlayerStats : MonoBehaviour
 
         }
 
+    }
+
+    public void EquipItem(Item item)
+    {
+        PhysicalDamage = item.baseDamage;
     }
 
 }

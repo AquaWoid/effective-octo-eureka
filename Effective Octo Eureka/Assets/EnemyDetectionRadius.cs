@@ -5,6 +5,8 @@ using UnityEngine;
 public class EnemyDetectionRadius : MonoBehaviour
 {
 
+    int rotationState;
+
     PlayerStats playerStats;
 
     bool localAttack = false;
@@ -63,7 +65,10 @@ public class EnemyDetectionRadius : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
 
-        if(collision.tag == "Arrow")
+
+
+
+        if (collision.tag == "Arrow")
         {
             Destroy(collision.gameObject);
         }
@@ -100,9 +105,20 @@ public class EnemyDetectionRadius : MonoBehaviour
     private void OnTriggerStay2D(Collider2D collision)
     {
 
-        if(collision.tag == "Player")
+
+
+        if (collision.tag == "Player")
         {
-           attack();
+
+            Vector2 v = transform.position - collision.transform.position;
+
+            float a = Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;
+            rotationState = (int)((Mathf.Round(a / 90f) + 4) % 4);
+
+
+            enemyAi.rotateToObject(rotationState);
+
+            attack();
             Debug.Log("Staying on trigger");
         }
 
