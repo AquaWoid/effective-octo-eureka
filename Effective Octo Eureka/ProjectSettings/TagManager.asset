@@ -11,6 +11,8 @@ TagManager:
   - DetectionLeft
   - DetectionUp
   - DetectionDown
+  - Enemy
+  - Wall
   layers:
   - Default
   - TransparentFX

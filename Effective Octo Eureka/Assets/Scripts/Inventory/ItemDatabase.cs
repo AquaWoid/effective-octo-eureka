@@ -23,7 +23,7 @@ public class ItemDatabase : MonoBehaviour
 
     public void AddItem()
     {
-        items.Add(new Item(1, "Berserkers", 20, 10, 1, 1, 0, 1, 0));
+        items.Add(new Item(1, "Berserkers", 1, 20, 10, 1, 1, 0, 1, 0, ItemType.sword));
     }
 
 

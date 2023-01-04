@@ -323,6 +323,10 @@ MonoBehaviour:
   ImmuneToBleed: 0
   ImmuneToBurning: 0
   Gold: 0
+  Inventory: []
+  itemHolderGO: {fileID: 2612494931948392815, guid: f1c56e98af04d6b4ab22c9b0d197798f, type: 3}
+  inventoryGrid: {fileID: 0}
+  hudSlider: []
 --- !u!114 &3113214297282333264
 MonoBehaviour:
   m_ObjectHideFlags: 0

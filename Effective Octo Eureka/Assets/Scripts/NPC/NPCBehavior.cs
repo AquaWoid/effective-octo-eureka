@@ -78,9 +78,15 @@ public class NPCBehavior : MonoBehaviour
     public void inRange()
     {
 
+        state = NpcStates.interacting;
+        anim.SetBool("Idle", true);
 
+    }
 
-
+    public void outOfRange()
+    {
+        state = NpcStates.pathing;
+        anim.SetBool("Idle", false);
     }
 
 
@@ -135,6 +141,10 @@ public class NPCBehavior : MonoBehaviour
 
         ///STATES
 
+        if(state == NpcStates.interacting)
+        {
+
+        }
 
         //PATHING
         if(state == NpcStates.pathing)

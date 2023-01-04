@@ -13,6 +13,14 @@ public class ObjectReferences : MonoBehaviour
     public GameObject Stats;
 
 
+    public Sprite swordSprite;
+    public Sprite chestSprite;
+
+    public GameObject EquipImageWeapon;
+    public GameObject EquipImageArmor;
+   // public GameObject BowHandling;
+
+
     private void Awake()
     {
         instance = this;

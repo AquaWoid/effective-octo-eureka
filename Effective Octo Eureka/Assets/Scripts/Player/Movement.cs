@@ -47,7 +47,7 @@ public class Movement : MonoBehaviour
 
             anim.SetBool("Attacking", true);
 
-            print("Attacked!!!!");
+          //  print("Attacked!!!!");
 
 
             StartCoroutine(attackDelay());

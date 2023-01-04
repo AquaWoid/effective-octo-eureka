@@ -12,9 +12,14 @@ public class EnemyAI : MonoBehaviour
     Text DamageText;
 
 
+    public int dropChance;
+
     public float level = 1;
 
     public float hp = 100;
+    public float maxHp = 100;
+
+    public float damage = 10;
 
     public float walkDistance = 1;
 
@@ -27,6 +32,7 @@ public class EnemyAI : MonoBehaviour
     [SerializeField]
     bool isAttacking = false;
 
+
     public int CoroutineState = 0;
 
     EnemyStates State;
@@ -38,7 +44,7 @@ public class EnemyAI : MonoBehaviour
 
     IEnumerator co;
 
-    // Start is called before the first frame update
+
     void Start()
     {
         HpSlider = transform.GetChild(1).GetChild(0).GetComponent<Slider>();
@@ -48,6 +54,7 @@ public class EnemyAI : MonoBehaviour
         State = EnemyStates.idle;
 
         hp *= level;
+        damage *= level;
         HpSlider.maxValue = hp;
 
         Player = GameObject.FindGameObjectWithTag("Player");
@@ -96,14 +103,6 @@ public class EnemyAI : MonoBehaviour
 
 
 
-            /*
-            if(Player.transform.position.x < transform.position.x - 5)
-            {
-                MoveRight();
-            }
-            */
-
-
         }
 
         if (State == EnemyStates.defending)
@@ -111,10 +110,26 @@ public class EnemyAI : MonoBehaviour
 
         }
 
+        if(State == EnemyStates.chasing)
+        {
+
+        }
 
 
         if (hp <= 0 )
         {
+
+
+            DropItem();
+
+
+            float x = level * Random.Range(10, 50);
+
+            int xp = Mathf.FloorToInt(x);
+
+            Player.GetComponent<PlayerStats>().getXP(xp);
+            Player.GetComponent<FlaskUsage>().gainCharge(1);
+
             Destroy(gameObject);
         }
 
@@ -147,6 +162,55 @@ public class EnemyAI : MonoBehaviour
 
         DamageText.text = hp.ToString("F2");
 
+    }
+
+
+    public void updateStats(int level)
+    {
+        hp = maxHp * level;
+        damage = damage * level;
+        HpSlider.maxValue = hp;
+
+    }
+
+    public void MoveToTarget(GameObject target)
+    {
+        if(isAttacking == false)
+        {
+            State = EnemyStates.chasing;
+            transform.position = Vector3.MoveTowards(transform.position, target.transform.position, 5 * Time.deltaTime);
+        }
+
+    }
+
+    public void EndChase()
+    {
+        State = EnemyStates.idle;
+    }
+
+    public void DropItem()
+    {
+        int rndDamage = Random.Range(10, 20);
+        int crit = Random.Range(10, 25);
+        int randomID = Random.Range(1000, 9999);
+        int rndPre1 = Random.Range(1, 8);
+        int rndPre2 = Random.Range(1, 8);
+        int rndSuf1 = Random.Range(1, 8);
+        int rndSuf2 = Random.Range(1, 8);
+
+        int rndDrop = Random.Range(dropChance, 100);
+
+        var found = Player.GetComponent<PlayerStats>().Inventory.Find(Item => Item.id == randomID);
+        if (found == null)
+        {
+            Item item = new Item(randomID, "Dropped Item", Mathf.FloorToInt(level), rndDamage * Mathf.FloorToInt(level), crit, rndPre1, rndPre2, rndSuf1, rndSuf2, 0, ItemType.sword);
+            print("Sent dropped item to inventory");
+            Player.GetComponent<PlayerStats>().LootItem(item);
+
+        }else
+        {
+            DropItem();
+        }
     }
 
     public void takeDamage(float damage)
@@ -254,7 +318,6 @@ public class EnemyAI : MonoBehaviour
     public void rotateToObject(int OrientationRotation)
     {
 
-
         if (OrientationRotation == 0)
         {
 
@@ -275,7 +338,6 @@ public class EnemyAI : MonoBehaviour
 
             animator.SetFloat("Blend", 0.33f);
         }
-
 
     }
 

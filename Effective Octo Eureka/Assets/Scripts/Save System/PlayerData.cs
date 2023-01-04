@@ -5,10 +5,15 @@ using UnityEngine;
 [System.Serializable]
 public class PlayerData
 {
-    public int Health;
+    public float Health;
+    public float maxHealth;
+
+    public float mana;
+    public float maxMana;
+
     public int level;
     public int exp;
-    public int xpneeded;
+    public float xpneeded;
     public float[] position;
 
     public float PhysicalDamage = 10;
@@ -28,11 +33,14 @@ public class PlayerData
 
     public PlayerData(PlayerStats player)
     {
-
+        maxHealth = player.maxHealth;
         Health = player.health;
         level = player.level;
         exp = player.xp;
         xpneeded = player.requieredXP;
+
+        mana = player.mana;
+        maxMana = player.maxMana;
 
         PhysicalDamage = player.PhysicalDamage;
         MagicalDamage = player.MagicalDamage;

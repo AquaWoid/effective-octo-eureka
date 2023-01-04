@@ -12,16 +12,25 @@ public class PlayerStats : MonoBehaviour
     private Text[] UiText;
 
     public int level = 1;
-    public int health = 100;
+    public float health = 100;
+    public float maxHealth = 100;
+
+    public float mana = 100;
+    public float maxMana = 100;
+
     public int xp = 0;
-    public int requieredXP = 200;
+    public float requieredXP = 200;
 
-    int lastRequiered;
+    float lastRequiered;
 
-    public float PhysicalDamage = 10;
-    public float MagicalDamage = 10;
+    public float PhysicalDamage = 100;
+    public float MagicalDamage = 100;
 
     public float Defence = 10;
+    public float maxDefence = 2000;
+    public float damageMitigation;
+
+
     public float ElementalResistance = 10;
 
     public float MovementSpeed = 10f;
@@ -31,6 +40,10 @@ public class PlayerStats : MonoBehaviour
 
     public int Gold;
 
+    float physCombined;
+    float defCombined;
+
+    FlaskUsage flask;
 
     int rnd;
 
@@ -58,11 +71,17 @@ public class PlayerStats : MonoBehaviour
     private void Start()
     {
 
-        hudSlider[0].maxValue = health;
+        flask = GetComponent<FlaskUsage>();
+
+        //HP, Mana and XP Bar initialization
+        hudSlider[0].maxValue = maxHealth;
+        hudSlider[1].maxValue = maxMana;
         hudSlider[2].maxValue = requieredXP;
 
+        //Visual Stats UI init
         canvas = transform.GetChild(0).GetComponent<Canvas>();
         int count = 0;
+
 
         //Declaration of UI Text childs
         foreach (Transform child in transform)
@@ -97,6 +116,11 @@ public class PlayerStats : MonoBehaviour
         //Loading data from Save file 
 
         PlayerData data = SaveSystem.LoadPlayer();
+        maxHealth = data.maxHealth;
+
+
+        mana = data.mana;
+        maxMana = data.maxMana;
 
         health = data.Health;
         level = data.level;
@@ -131,7 +155,8 @@ public class PlayerStats : MonoBehaviour
 
             //  GameObject go = Instantiate(itemHolderGO, transform.GetChild(0).GetChild(12).GetChild(0));
             GameObject go = Instantiate(itemHolderGO, inventoryGrid.transform);
-            go.GetComponent<ItemHolder>().updateInventoryEntries(item);
+           // go.GetComponent<ItemHolder>().updateInventoryEntries(item);
+            go.GetComponentInChildren<ItemHolder>().updateInventoryEntries(item);
 
             print("Applied: " + item.title + " to: " + go.name);
 
@@ -143,26 +168,32 @@ public class PlayerStats : MonoBehaviour
     private void Update()
     {
 
+        damageMitigation = (Defence / maxDefence) / 2;
 
+        //Prevent mana from goint to minus
+        if (mana < 0)
+        {
+            mana = 0;
+        }
+
+        //Hp, Mana and XP Bar UI update
         hudSlider[0].value = health;
+        hudSlider[1].value = mana;
         hudSlider[2].value = xp;
 
         //Debug Key triggers
 
          rnd = Random.Range(1, 8);
-      //  print(rnd);
 
+        //Add XP - will be gone when the debug menu is finished
         if (Input.GetKeyDown(KeyCode.R))
         {
             xp += 1000;
             requieredXP -= 1000;
 
-            Inventory.Clear();
-            AddItem();
-
         }
 
-
+        //Add Item - will be gone when the debug menu is finished
         if (Input.GetKeyDown(KeyCode.T))
         {
 
@@ -170,13 +201,17 @@ public class PlayerStats : MonoBehaviour
 
         }
 
+        //Open Inventory
         if (Input.GetKeyDown(KeyCode.I))
         {
             if(canvas.enabled == true)
             {
+                Time.timeScale = 1;
                 canvas.enabled = false;
+                
             }else
             {
+                Time.timeScale = 0;
                 canvas.enabled = true;
             }
 
@@ -195,6 +230,7 @@ public class PlayerStats : MonoBehaviour
         UiText[7].text = "Elemental Resistance " + ElementalResistance;
         UiText[8].text = "Movement Speed " + MovementSpeed;
         UiText[9].text = "Gold " + Gold;
+        UiText[10].text = "Damage Mitigation: " + damageMitigation * 100 + "%";
 
         //Level up condition
         if (requieredXP <= 0)
@@ -205,7 +241,7 @@ public class PlayerStats : MonoBehaviour
         //Knockback condition
         if(knockedBack == true)
         {
-            transform.Translate(Mathf.Lerp(0, -2, Time.deltaTime), 0, 0);
+            transform.Translate(Mathf.Lerp(0, -5, Time.deltaTime), 0, 0);
         }
 
 
@@ -221,44 +257,84 @@ public class PlayerStats : MonoBehaviour
 
 
     //Damage income function
-    public void takeDamage(int damage)
+    public void takeDamage(float damage)
     {
+        //Wood's super duper defence calculation
+        damageMitigation = (Defence / maxDefence) / 2;
+        damage = (damage - (damage * damageMitigation));
         health -= damage;
-     //   StartCoroutine(knockback());
+
+      //  StartCoroutine(knockback());
 
 
     }
 
+    //Heal function - ist triggered from the FlaskUsage script
+    public void heal(float amount)
+    {
+        health += amount;
+        if(health >= maxHealth)
+        {
+            health = maxHealth;
+        }
+    }
+
+    //Mana Regen function - ist triggered from the FlaskUsage script
+    public void healMana(float amount)
+    {
+        mana += amount;
+        if (mana >= maxMana)
+        {
+            mana = maxMana;
+        }
+    }
+
+    //XP Gaining function - is triggered from the EnemyAi script
+    public void getXP(int externalXP)
+    {
+        xp += externalXP;
+    }
 
     //Level up function
-    void levelUp()
+    public void levelUp()
     {
-        requieredXP = lastRequiered * 2;
+        requieredXP = lastRequiered * 1.25f;
         lastRequiered = requieredXP;
-
+        maxHealth *= 1.1f;
+        maxMana *= 1.1f;
+        mana = maxMana;
+        health = maxHealth;
         hudSlider[2].maxValue = requieredXP;
+        hudSlider[0].maxValue = maxHealth;
+        hudSlider[1].maxValue = maxMana;
 
         xp = 0;
 
         level += 1;
 
-        PhysicalDamage *= 1.5f;
-        MagicalDamage *= 1.5f;
+        PhysicalDamage *= 1.15f;
+        MagicalDamage *= 1.145f;
 
-        Defence *= 1.5f;
-        ElementalResistance *= 1.5f;
+        Defence *= 1.16f;
+        ElementalResistance *= 1.0595f;
 
+        flask.updateRecoverAmount(maxHealth * 0.1f);
 
     }
 
 
-    //Loot item to inventory function -> Work in progress
+    //Loot item to inventory function - can be triggered from EnemyAi script and the DebugMenu 
     public void LootItem(Item externalItem)
     {
+        Inventory.Add(externalItem);
 
+        GameObject go = Instantiate(itemHolderGO, inventoryGrid.transform);
+       // go.GetComponent<ItemHolder>().updateInventoryEntries(externalItem);
+        go.GetComponentInChildren<ItemHolder>().updateInventoryEntries(externalItem);
+        print("Received dropped item to inventory");
     }
 
-    //Add item to inventory function
+    //Add item to inventory function - DEBUG - soon deprecated due to the Debug Menu
     public void AddItem()
     {
 
@@ -310,12 +386,13 @@ public class PlayerStats : MonoBehaviour
         if (found == null)
         {
 
-            Item addedItem = new Item(randomID, titleStr, rnd * 20, rnd * 10, rndPre1, rndPre2, rndSuf1, rndSuf2, 0);
+            Item addedItem = new Item(randomID, titleStr, 1, rnd * 20, rnd * 10, rndPre1, rndPre2, rndSuf1, rndSuf2, 0, ItemType.sword);
 
             Inventory.Add(addedItem);
 
             GameObject go = Instantiate(itemHolderGO, inventoryGrid.transform);
-            go.GetComponent<ItemHolder>().updateInventoryEntries(addedItem);
+            //go.GetComponent<ItemHolder>().updateInventoryEntries(addedItem);
+            go.GetComponentInChildren<ItemHolder>().updateInventoryEntries(addedItem);
 
         }
         else
@@ -362,7 +439,8 @@ public class PlayerStats : MonoBehaviour
         {
 
             GameObject go = Instantiate(itemHolderGO, inventoryGrid.transform);
-            go.GetComponent<ItemHolder>().updateInventoryEntries(item);
+          //  go.GetComponent<ItemHolder>().updateInventoryEntries(item);
+            go.GetComponentInChildren<ItemHolder>().updateInventoryEntries(item);
 
             print("Sorted by Base Damage");
 
@@ -370,9 +448,19 @@ public class PlayerStats : MonoBehaviour
 
     }
 
+    //Item Equip Function - work in progress - to do: add weapon damage correctly to base character damage
     public void EquipItem(Item item)
     {
-        PhysicalDamage = item.baseDamage;
+        if(item.type == ItemType.sword)
+        {
+
+            PhysicalDamage = item.baseDamage;
+        }
+        if(item.type == ItemType.chest)
+        {
+            Defence = item.baseDamage;
+        }
+
     }
 
 }

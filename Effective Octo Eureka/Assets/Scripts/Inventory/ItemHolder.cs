@@ -10,7 +10,8 @@ public class ItemHolder : MonoBehaviour
      public System.Guid guid;
      string title;
 
-
+     int itemLevel;
+     
      int baseDamage;
      float critChance;
 
@@ -22,6 +23,10 @@ public class ItemHolder : MonoBehaviour
 
      int craftedID;
 
+    ItemType type;
+
+
+    public Text type_text;
     public Text title_text;
     public Text baseDamage_text;
     public Text critChance_text;
@@ -34,14 +39,26 @@ public class ItemHolder : MonoBehaviour
 
     public Text craftedID_text;
 
+    public Text itemLevel_text;
+
+
     PlayerStats playerStats;
 
-    public 
+
 
 
     // Start is called before the first frame update
     void Start()
     {
+
+        if(type == ItemType.sword)
+        {
+            transform.GetChild(0).GetComponent<Image>().sprite = ObjectReferences.instance.swordSprite;
+        }
+        if(type == ItemType.chest)
+        {
+            transform.GetChild(0).GetComponent<Image>().sprite = ObjectReferences.instance.chestSprite;
+        }
 
         playerStats = transform.parent.parent.parent.parent.parent.parent.GetComponent<PlayerStats>();
 
@@ -59,9 +76,10 @@ public class ItemHolder : MonoBehaviour
         suffix1ID_text = stats.GetChild(5).GetComponent<Text>();
         suffix2ID_text = stats.GetChild(6).GetComponent<Text>();
         craftedID_text = stats.GetChild(7).GetComponent<Text>();
-
-
+        itemLevel_text = stats.GetChild(8).GetComponent<Text>();
+        type_text = stats.GetChild(9).GetComponent<Text>();
         //Stat text init
+        itemLevel_text.text = "";
         baseDamage_text.text = "";
         critChance_text.text = "";
         prefix1ID_text.text = "";
@@ -69,7 +87,7 @@ public class ItemHolder : MonoBehaviour
         suffix1ID_text.text = "";
         suffix2ID_text.text = "";
         craftedID_text.text = "";
-
+        type_text.text = "";
     }
 
     // Update is called once per frame
@@ -84,6 +102,7 @@ public class ItemHolder : MonoBehaviour
     public void updateInventoryEntries(Item item)
     {
         id = item.id;
+        itemLevel = item.itemLevel;
         title = item.title;
         baseDamage = item.baseDamage;
         critChance = item.critChance;
@@ -92,6 +111,7 @@ public class ItemHolder : MonoBehaviour
         suffix1ID = item.suffix1ID;
         suffix2ID = item.suffix2ID;
         craftedID = item.craftedID;
+        type = item.type;
 
     }
 
@@ -99,117 +119,131 @@ public class ItemHolder : MonoBehaviour
     //Stat show hover event
     public void enableStats()
     {
-        switch (prefix1ID)
+
+        if(type == ItemType.sword)
         {
-            case (1):
-                prefix1ID_text.text = "#% increased Weapon Damage";
-                break;
-            case (2):
-                prefix1ID_text.text = "Adds # to Weapon Damage";
-                break;
-            case (3):
-                prefix1ID_text.text = "Weapon is burning";
-                break;
-            case (4):
-                prefix1ID_text.text = "Weapon fires a magic projectile";
-                break;
-            case (5):
-                prefix1ID_text.text = "Weapon deals more damage agains Shielded Enemies";
-                break;
-            case (6):
-                prefix1ID_text.text = "Kills with this weapon have #% chance to spawn healing orbs";
-                break;
-            case (7):
-                prefix1ID_text.text = "Kills with this weapon have #% chance to award bonus gold";
-                break;
+            switch (prefix1ID)
+            {
+                case (1):
+                    prefix1ID_text.text = "#% increased Weapon Damage";
+                    break;
+                case (2):
+                    prefix1ID_text.text = "Adds # to Weapon Damage";
+                    break;
+                case (3):
+                    prefix1ID_text.text = "Weapon is burning";
+                    break;
+                case (4):
+                    prefix1ID_text.text = "Weapon fires a magic projectile";
+                    break;
+                case (5):
+                    prefix1ID_text.text = "Weapon deals more damage agains Shielded Enemies";
+                    break;
+                case (6):
+                    prefix1ID_text.text = "Kills with this weapon have #% chance to spawn healing orbs";
+                    break;
+                case (7):
+                    prefix1ID_text.text = "Kills with this weapon have #% chance to award bonus gold";
+                    break;
+            }
+
+            switch (prefix2ID)
+            {
+                case (1):
+                    prefix2ID_text.text = "#% increased Weapon Damage";
+                    break;
+                case (2):
+                    prefix2ID_text.text = "Adds # to Weapon Damage";
+                    break;
+                case (3):
+                    prefix2ID_text.text = "Weapon is burning";
+                    break;
+                case (4):
+                    prefix2ID_text.text = "Weapon fires a magic projectile";
+                    break;
+                case (5):
+                    prefix2ID_text.text = "Weapon deals more damage agains Shielded Enemies";
+                    break;
+                case (6):
+                    prefix2ID_text.text = "Kills with this weapon have #% chance to spawn healing orbs";
+                    break;
+                case (7):
+                    prefix2ID_text.text = "Kills with this weapon have #% chance to award bonus gold";
+                    break;
+            }
+
+            switch (suffix1ID)
+            {
+                case (1):
+                    suffix1ID_text.text = "Weapon has #% chance to Poison on hit";
+                    break;
+                case (2):
+                    suffix1ID_text.text = "Weapon grants # increased chance to Bleed ";
+                    break;
+                case (3):
+                    suffix1ID_text.text = "Weapon has #% increased critical strike chance";
+                    break;
+                case (4):
+                    suffix1ID_text.text = "Kills with this weapon have #% chance to leech life";
+                    break;
+                case (5):
+                    suffix1ID_text.text = "Hits with this weapon have #% chance to leech life";
+                    break;
+                case (6):
+                    suffix1ID_text.text = "continous hits with this weapon increase weapon damage by #%";
+                    break;
+                case (7):
+                    suffix1ID_text.text = "kills with this weapon have #% chanceto create a poison cloud";
+                    break;
+            }
+
+            switch (suffix2ID)
+            {
+                case (1):
+                    suffix2ID_text.text = "Weapon has #% chance to Poison on hit";
+                    break;
+                case (2):
+                    suffix2ID_text.text = "Weapon grants # increased chance to Bleed ";
+                    break;
+                case (3):
+                    suffix2ID_text.text = "Weapon has #% increased critical strike chance";
+                    break;
+                case (4):
+                    suffix2ID_text.text = "Kills with this weapon have #% chance to leech life";
+                    break;
+                case (5):
+                    suffix2ID_text.text = "Hits with this weapon have #% chance to leech life";
+                    break;
+                case (6):
+                    suffix2ID_text.text = "continous hits with this weapon increase weapon damage by #%";
+                    break;
+                case (7):
+                    suffix2ID_text.text = "kills with this weapon have #% chanceto create a poison cloud";
+                    break;
+            }
+            critChance_text.text = "Crit chance: " + critChance.ToString();
+            baseDamage_text.text = "Damage: " + baseDamage.ToString();
         }
 
-        switch (prefix2ID)
+
+        if(type == ItemType.chest)
         {
-            case (1):
-                prefix2ID_text.text = "#% increased Weapon Damage";
-                break;
-            case (2):
-                prefix2ID_text.text = "Adds # to Weapon Damage";
-                break;
-            case (3):
-                prefix2ID_text.text = "Weapon is burning";
-                break;
-            case (4):
-                prefix2ID_text.text = "Weapon fires a magic projectile";
-                break;
-            case (5):
-                prefix2ID_text.text = "Weapon deals more damage agains Shielded Enemies";
-                break;
-            case (6):
-                prefix2ID_text.text = "Kills with this weapon have #% chance to spawn healing orbs";
-                break;
-            case (7):
-                prefix2ID_text.text = "Kills with this weapon have #% chance to award bonus gold";
-                break;
+            baseDamage_text.text = "Armor: " + baseDamage.ToString();
         }
 
-        switch (suffix1ID)
-        {
-            case (1):
-                suffix1ID_text.text = "Weapon has #% chance to Poison on hit";
-                break;
-            case (2):
-                suffix1ID_text.text = "Weapon grants # increased chance to Bleed ";
-                break;
-            case (3):
-                suffix1ID_text.text = "Weapon has #% increased critical strike chance";
-                break;
-            case (4):
-                suffix1ID_text.text = "Kills with this weapon have #% chance to leech life";
-                break;
-            case (5):
-                suffix1ID_text.text = "Hits with this weapon have #% chance to leech life";
-                break;
-            case (6):
-                suffix1ID_text.text = "continous hits with this weapon increase weapon damage by #%";
-                break;
-            case (7):
-                suffix1ID_text.text = "kills with this weapon have #% chanceto create a poison cloud";
-                break;
-        }
-
-        switch (suffix2ID)
-        {
-            case (1):
-                suffix2ID_text.text = "Weapon has #% chance to Poison on hit";
-                break;
-            case (2):
-                suffix2ID_text.text = "Weapon grants # increased chance to Bleed ";
-                break;
-            case (3):
-                suffix2ID_text.text = "Weapon has #% increased critical strike chance";
-                break;
-            case (4):
-                suffix2ID_text.text = "Kills with this weapon have #% chance to leech life";
-                break;
-            case (5):
-                suffix2ID_text.text = "Hits with this weapon have #% chance to leech life";
-                break;
-            case (6):
-                suffix2ID_text.text = "continous hits with this weapon increase weapon damage by #%";
-                break;
-            case (7):
-                suffix2ID_text.text = "kills with this weapon have #% chanceto create a poison cloud";
-                break;
-        }
-
+        itemLevel_text.text = "Item Leve: " + itemLevel.ToString();
         title_text.text = title;
-        baseDamage_text.text = "Damage: " + baseDamage.ToString();
-        critChance_text.text = "Crit chance: " + critChance.ToString();
-        craftedID_text.text = "Unique ID " + id.ToString();
 
+
+        craftedID_text.text = "Unique ID " + id.ToString();
+        type_text.text = "Type: " + type;
 
     }
 
     //Stat hide hover event
     public void disableStats()
     {
+        itemLevel_text.text = "";
         title_text.text = "";
         baseDamage_text.text = "";
         critChance_text.text = "";
@@ -218,15 +252,13 @@ public class ItemHolder : MonoBehaviour
         suffix1ID_text.text = "";
         suffix2ID_text.text = "";
         craftedID_text.text = "";
+        type_text.text = "";
 
     }
 
     //Delete item  -> also deletes from the Inventory DB
     public void Scrap()
     {
-
-
-
         playerStats.ScrapItem(id);
         Destroy(gameObject);
     }
@@ -235,7 +267,19 @@ public class ItemHolder : MonoBehaviour
     public void Equip()
     {
 
-        Item i = new Item(id, title, baseDamage, critChance, prefix1ID, prefix2ID, suffix1ID, suffix2ID, craftedID);
+        if(type == ItemType.chest)
+        {
+            ObjectReferences.instance.EquipImageArmor.transform.SetParent(transform.parent, false);
+         //   ObjectReferences.instance.EquipImageArmor.GetComponent<RectTransform>().position = new Vector3(50, -50, 0);
+        }
+
+        if (type == ItemType.sword)
+        {
+            ObjectReferences.instance.EquipImageWeapon.transform.SetParent(transform.parent, false);
+      //      ObjectReferences.instance.EquipImageWeapon.GetComponent<RectTransform>().position = new Vector3(50, -50, 0);
+        }
+
+        Item i = new Item(id, title, itemLevel, baseDamage, critChance, prefix1ID, prefix2ID, suffix1ID, suffix2ID, craftedID, type);
 
         playerStats.EquipItem(i);
 

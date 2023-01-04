@@ -6,6 +6,13 @@ public class BowHandling : MonoBehaviour
 {
 
     public GameObject Arrow;
+    PlayerStats player;
+   // public GameObject player;
+
+
+    public float ArrowSpeed = 1;
+
+    GameObject trns;
 
     Animator anim;
 
@@ -15,7 +22,9 @@ public class BowHandling : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+     //  transform.position = player.transform.position;
         anim = GetComponent<Animator>();
+        player = transform.GetComponent<PlayerStats>();
     }
 
     // Update is called once per frame
@@ -24,10 +33,16 @@ public class BowHandling : MonoBehaviour
 
         if(Input.GetKeyDown(KeyCode.E))
         {
-            if(isShooting == false)
+
+            if(player.mana >= 10)
             {
-                StartCoroutine(bowDelay(shootingDelay));
+                if (isShooting == false)
+                {
+                    StartCoroutine(bowDelay(shootingDelay));
+                }
             }
+
+
 
         }
         
@@ -37,8 +52,12 @@ public class BowHandling : MonoBehaviour
     {
         anim.SetBool("Bow", true);
         isShooting = true;
+        player.mana -= 10;
         yield return new WaitForSeconds(delay);
         Instantiate(Arrow);
+
+
+
         isShooting = false;
         anim.SetBool("Bow", false);
     }

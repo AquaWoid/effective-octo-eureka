@@ -30,7 +30,7 @@ public class DetectionRadius : MonoBehaviour
 
         if(Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
         {
-            Vector3 axes = new Vector3((Input.GetAxisRaw("Horizontal") * 1.5f), (Input.GetAxisRaw("Vertical") * 1.5f), 0.5f);
+            Vector3 axes = new Vector3((Input.GetAxisRaw("Horizontal") * 2f), (Input.GetAxisRaw("Vertical") * 2f), 0.5f);
 
 
             Vector3 combined = transform.parent.position + axes;
@@ -92,14 +92,23 @@ public class DetectionRadius : MonoBehaviour
     {
         transform.GetComponent<SpriteRenderer>().color = new Vector4(255, 0, 0, 50);
 
-        eAI = collision.GetComponent<EnemyAI>();
 
+
+
+    }
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.tag == "Enemy")
+        {
+            eAI = collision.GetComponent<EnemyAI>();
+        }
     }
 
 
     private void OnTriggerExit2D(Collider2D collision)
     {
         transform.GetComponent<SpriteRenderer>().color = new Vector4(0, 255, 0, 50);
-        eAI = null;
+     //   eAI = null;
     }
 }

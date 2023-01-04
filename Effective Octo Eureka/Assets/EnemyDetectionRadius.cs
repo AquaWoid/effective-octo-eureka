@@ -7,6 +7,8 @@ public class EnemyDetectionRadius : MonoBehaviour
 
     int rotationState;
 
+    public float damage = 5f;
+
     PlayerStats playerStats;
 
     bool localAttack = false;
@@ -17,8 +19,11 @@ public class EnemyDetectionRadius : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
         animator = transform.parent.GetComponent<Animator>();
         enemyAi = transform.parent.GetComponent<EnemyAI>();
+
+        damage *= enemyAi.level;
     }
 
     // Update is called once per frame
@@ -35,6 +40,7 @@ public class EnemyDetectionRadius : MonoBehaviour
         }
     }
 
+    //Attack coroutine
     IEnumerator attackDelay()
     {
 
@@ -46,7 +52,7 @@ public class EnemyDetectionRadius : MonoBehaviour
 
         if (playerStats != null)
         {
-            playerStats.takeDamage(5);
+            playerStats.takeDamage(damage);
 
             float rnd = Random.Range(0, 5);
 
@@ -65,9 +71,6 @@ public class EnemyDetectionRadius : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
 
-
-
-
         if (collision.tag == "Arrow")
         {
             Destroy(collision.gameObject);
@@ -80,6 +83,7 @@ public class EnemyDetectionRadius : MonoBehaviour
             print("got playerstats: " + playerStats);
             animator.SetBool("Attacking", true);
             enemyAi.setAttacking();
+
         }
 
 
@@ -87,8 +91,6 @@ public class EnemyDetectionRadius : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-
-
 
         if (collision.tag == "Player")
         {
@@ -99,13 +101,12 @@ public class EnemyDetectionRadius : MonoBehaviour
             playerStats = null;
             animator.SetBool("Attacking", false);
             enemyAi.unsetAttacking();
+
         }
     }
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-
-
 
         if (collision.tag == "Player")
         {
@@ -119,7 +120,7 @@ public class EnemyDetectionRadius : MonoBehaviour
             enemyAi.rotateToObject(rotationState);
 
             attack();
-            Debug.Log("Staying on trigger");
+
         }
 
     }
