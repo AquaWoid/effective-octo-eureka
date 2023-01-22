@@ -13,6 +13,11 @@ public class DetectionRadius : MonoBehaviour
 
     PlayerStats Stats;
 
+    [SerializeField]
+    List<GrassBehavior> grass = new List<GrassBehavior>();
+
+   // List<GameObject> enemies = new List<GameObject>();
+
     // Start is called before the first frame update
     void Start()
     {
@@ -26,7 +31,6 @@ public class DetectionRadius : MonoBehaviour
 
 
 
-      
 
         if(Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
         {
@@ -48,6 +52,14 @@ public class DetectionRadius : MonoBehaviour
 
             }
 
+        
+        
+        foreach(GrassBehavior gb in grass)
+        {   
+            if(gb != null)
+            gb.Cut();
+        }
+
 
 
 
@@ -62,25 +74,29 @@ public class DetectionRadius : MonoBehaviour
 
     IEnumerator attackDelay()
     {
+
+
+
         yield return new WaitForSeconds(0.5f);
 
         float damageMult = Random.Range(1, 1.5f);
 
 
-        if(eAI != null)
+
+        if (eAI != null)
         {
+
             eAI.takeDamage(Stats.PhysicalDamage);
 
             float rnd = Random.Range(0, 5);
 
             if (rnd == 0)
             {
+
                 eAI.bleeding(1);
 
-             //   print("rnd was: " + rnd);
             }
         }
-
 
 
 
@@ -92,9 +108,9 @@ public class DetectionRadius : MonoBehaviour
     {
         transform.GetComponent<SpriteRenderer>().color = new Vector4(255, 0, 0, 50);
 
-
-
-
+        //  enemies.Add(collision.gameObject);
+        grass.Add(collision.GetComponent<GrassBehavior>());
+        
     }
 
     private void OnTriggerStay2D(Collider2D collision)
@@ -103,12 +119,15 @@ public class DetectionRadius : MonoBehaviour
         {
             eAI = collision.GetComponent<EnemyAI>();
         }
+
+       // grass = collision.GetComponent<GrassBehavior>();
     }
 
 
     private void OnTriggerExit2D(Collider2D collision)
     {
+        grass.Remove(collision.GetComponent<GrassBehavior>());
         transform.GetComponent<SpriteRenderer>().color = new Vector4(0, 255, 0, 50);
-     //   eAI = null;
+        eAI = null;
     }
 }

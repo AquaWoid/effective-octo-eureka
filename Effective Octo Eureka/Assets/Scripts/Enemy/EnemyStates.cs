@@ -3,6 +3,8 @@ public enum EnemyStates {
     idle,
     attacking,
     defending,
-    chasing
+    chasing,
+    dead,
+    pathing
     
     }

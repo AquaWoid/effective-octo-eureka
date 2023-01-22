@@ -36,7 +36,25 @@ public class EnemyDetectionRadius : MonoBehaviour
     {
         if(localAttack == false)
         {
-            StartCoroutine(attackDelay());
+          //  StartCoroutine(attackDelay());
+        }
+    }
+
+
+    public void atk()
+    {
+        if (playerStats != null)
+        {
+            playerStats.takeDamage(damage);
+
+            float rnd = Random.Range(0, 5);
+
+            if (rnd == 0)
+            {
+                //  playerStats.bleeding(1);
+
+                print("rnd was: " + rnd);
+            }
         }
     }
 

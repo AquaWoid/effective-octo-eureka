@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using EurekaEssentials;
 
 public class EnemyAI : MonoBehaviour
 {
@@ -12,14 +13,22 @@ public class EnemyAI : MonoBehaviour
     Text DamageText;
 
 
-    public int dropChance;
-
+    [Header("Stats")]
+    [Tooltip("Level, multiplies HP and Damage")]
     public float level = 1;
 
-    public float hp = 100;
-    public float maxHp = 100;
+    [ShowOnly] public float hp = 1000;
+    public float maxHp = 1000;
 
-    public float damage = 10;
+    public float baseDamage = 10;
+
+
+    [Tooltip("Drop chance in %")]
+    public int dropChance;
+
+    [Header("Behavior")]
+    [Tooltip("Time to revive in Seconds")]
+    public int ReviveTime = 10;
 
     public float walkDistance = 1;
 
@@ -32,21 +41,68 @@ public class EnemyAI : MonoBehaviour
     [SerializeField]
     bool isAttacking = false;
 
+    public bool isDead = false;
+
 
     public int CoroutineState = 0;
 
-    EnemyStates State;
+    public EnemyStates State;
     EnemyMoveStates MoveState;
 
     GameObject Player;
 
+    EnemyDetectionRadius detectionRadius;
+    ChaseRadius chaseRadius;
+
     Animator animator;
 
-    IEnumerator co;
+    [Header("Pathing")]
 
+    Pathfinding pathfinding = new Pathfinding();
+
+    [Header("Pathfinding")]
+    public float speed = 10;
+
+    [Tooltip("Drag the path to follow here")]
+    public GameObject path;
+
+    [Tooltip("OFF = If the last waypoint is reached, NPC goes back on the same path. \nON = NPC Loops trough waypoints, goint straight to the first waypoint after reaching the last")]
+    public bool circleMove = true;
+
+    public bool WaypointVisible = true;
+
+    [Tooltip("Waypoints are declared dinamically from the path parent")]
+    [SerializeField]
+    [HideInInspector] private List<Transform> waypoints;
+
+
+    private void Awake()
+    {
+        
+        if (path == null)
+        {
+            EssentialCalculations essentialCalculations = new EssentialCalculations();
+
+            path = essentialCalculations.closest_Object(transform, "Path");
+           
+        }
+    }
 
     void Start()
     {
+
+                int count = 0;
+        foreach (Transform child in path.transform)
+        {
+            //  Debug.Log(count + " : " + child);
+            waypoints.Add(child);
+            count += 1;
+        }
+
+
+
+        pathfinding.initializeWaypoints(path);
+
         HpSlider = transform.GetChild(1).GetChild(0).GetComponent<Slider>();
         statusText = transform.GetChild(1).GetChild(0).GetChild(3).GetComponent<Text>();
         DamageText = transform.GetChild(1).GetChild(0).GetChild(4).GetComponent<Text>();
@@ -54,7 +110,8 @@ public class EnemyAI : MonoBehaviour
         State = EnemyStates.idle;
 
         hp *= level;
-        damage *= level;
+        maxHp *= level;
+        baseDamage *= level;
         HpSlider.maxValue = hp;
 
         Player = GameObject.FindGameObjectWithTag("Player");
@@ -63,10 +120,42 @@ public class EnemyAI : MonoBehaviour
 
         animator.SetBool("Idle", false);
 
+        detectionRadius = GetComponentInChildren<EnemyDetectionRadius>();
+        chaseRadius = GetComponentInChildren<ChaseRadius>();
 
         StartCoroutine(move());
+
+
+
+
     }
 
+
+    public void attack()
+    {
+        detectionRadius.atk();
+    }
+
+    public void setNewPath(GameObject newPath)
+    {
+        path = newPath;
+
+        waypoints.Clear();
+
+        int count = 0;
+        foreach (Transform child in path.transform)
+        {
+            //  Debug.Log(count + " : " + child);
+            waypoints.Add(child);
+            count += 1;
+        }
+
+    }
+
+    public void resetWaypoint()
+    {
+        pathfinding.resetPosCount();
+    }
 
     void Update()
     {
@@ -74,63 +163,14 @@ public class EnemyAI : MonoBehaviour
 
         if (State == EnemyStates.idle)
         {
-
-            if(MoveState == EnemyMoveStates.left)
-            {
-                transform.Translate(-0.5f * Time.deltaTime, 0, 0);
-               // Debug.Log("left");
-            }
-            if (MoveState == EnemyMoveStates.up)
-            {
-                transform.Translate(0, 0.5f * Time.deltaTime, 0);
-               // Debug.Log("up");
-            }
-            if (MoveState == EnemyMoveStates.right)
-            {
-                transform.Translate(0.5f * Time.deltaTime, 0, 0);
-               // Debug.Log("right");
-            }
-            if (MoveState == EnemyMoveStates.down)
-            {
-                transform.Translate(0, -0.5f * Time.deltaTime, 0);
-              //  Debug.Log("down");
-            }
-
-        }
-
-        if (State == EnemyStates.attacking)
-        {
-
-
-
-        }
-
-        if (State == EnemyStates.defending)
-        {
-
-        }
-
-        if(State == EnemyStates.chasing)
-        {
+            pathfinding.findPath(transform, animator, speed, path, circleMove, WaypointVisible, waypoints);
 
         }
 
 
         if (hp <= 0 )
         {
-
-
-            DropItem();
-
-
-            float x = level * Random.Range(10, 50);
-
-            int xp = Mathf.FloorToInt(x);
-
-            Player.GetComponent<PlayerStats>().getXP(xp);
-            Player.GetComponent<FlaskUsage>().gainCharge(1);
-
-            Destroy(gameObject);
+            Death();
         }
 
         HpSlider.value = hp;
@@ -145,12 +185,9 @@ public class EnemyAI : MonoBehaviour
         if(isBleeding)
         {
             float tempHp = hp;
-
             hp -= Time.deltaTime * 4;
             statusText.text = "Status: Bleeding";
             DamageText.color = Color.red;
-
-
 
         }
 
@@ -165,30 +202,95 @@ public class EnemyAI : MonoBehaviour
     }
 
 
+    void Death()
+    {
+        if (isDead == false)
+        {
+            isDead = true;
+            animator.SetBool("Dead", true);
+            hp = 0;
+            State = EnemyStates.dead;
+
+
+            DropItem();
+
+            Player.GetComponent<PlayerStats>().getXP(xpCalc());
+            Player.GetComponent<FlaskUsage>().gainCharge(1);
+
+            chaseRadius.gameObject.SetActive(false);
+            detectionRadius.gameObject.SetActive(false);
+
+            StartCoroutine(revivalTimer());
+
+        }
+    }
+
+    int xpCalc()
+    {
+        float x = level * Random.Range(10, 50);
+        int p = Mathf.FloorToInt(x);
+        return p;
+    }
+
+    IEnumerator revivalTimer()
+    {
+
+        yield return new WaitForSeconds(ReviveTime);
+        State = EnemyStates.idle;
+        hp = maxHp;
+        chaseRadius.gameObject.SetActive(true);
+        detectionRadius.gameObject.SetActive(true);
+        animator.SetBool("Dead", false);
+        isDead = false;
+
+
+    }
+
     public void updateStats(int level)
     {
         hp = maxHp * level;
-        damage = damage * level;
+        baseDamage = baseDamage * level;
         HpSlider.maxValue = hp;
 
     }
 
     public void MoveToTarget(GameObject target)
     {
-        if(isAttacking == false)
+        if(isAttacking == false && State != EnemyStates.dead)
         {
             State = EnemyStates.chasing;
             transform.position = Vector3.MoveTowards(transform.position, target.transform.position, 5 * Time.deltaTime);
+
         }
 
     }
 
     public void EndChase()
     {
-        State = EnemyStates.idle;
+        if(isDead == false)
+        {
+            State = EnemyStates.idle;
+        }
+
     }
 
     public void DropItem()
+    {
+
+        int randRoll = Random.Range(1, 100);
+        print("RandRoll was: " + randRoll);
+        for (int i = 0; i < dropChance; i++)
+        {
+            if(i == randRoll)
+            {
+                addNewItem();
+                break;
+            }
+        }
+
+    }
+
+    void addNewItem()
     {
         int rndDamage = Random.Range(10, 20);
         int crit = Random.Range(10, 25);
@@ -207,9 +309,10 @@ public class EnemyAI : MonoBehaviour
             print("Sent dropped item to inventory");
             Player.GetComponent<PlayerStats>().LootItem(item);
 
-        }else
+        }
+        else
         {
-            DropItem();
+            addNewItem();
         }
     }
 
@@ -233,6 +336,9 @@ public class EnemyAI : MonoBehaviour
     IEnumerator move ()
     {
 
+        if(isDead == false)
+        {
+
             CoroutineState = 1;
             MoveRight();
             yield return new WaitForSeconds(walkDistance);
@@ -249,9 +355,12 @@ public class EnemyAI : MonoBehaviour
             CoroutineState = 4;
             MoveUp();
             yield return new WaitForSeconds(walkDistance);
-       
 
-        StartCoroutine(move());
+
+            StartCoroutine(move());
+
+        }
+
     }
 
 
@@ -305,7 +414,11 @@ public class EnemyAI : MonoBehaviour
       //  co = move();
      //   StartCoroutine(co);
         isAttacking = false;
-        State = EnemyStates.idle;
+        if(isDead == false)
+        {
+            State = EnemyStates.idle;
+        }
+
 
     }
 
@@ -318,26 +431,31 @@ public class EnemyAI : MonoBehaviour
     public void rotateToObject(int OrientationRotation)
     {
 
-        if (OrientationRotation == 0)
+        if(isDead == false)
         {
+            if (OrientationRotation == 0)
+            {
 
-            animator.SetFloat("Blend", 0);
-        }
-        if (OrientationRotation == 1)
-        {
+                animator.SetFloat("Blend", 0);
+            }
+            if (OrientationRotation == 1)
+            {
 
-            animator.SetFloat("Blend", 1);
-        }
-        if (OrientationRotation == 2)
-        {
+                animator.SetFloat("Blend", 1);
+            }
+            if (OrientationRotation == 2)
+            {
 
-            animator.SetFloat("Blend", 0.66f);
-        }
-        if (OrientationRotation == 3)
-        {
+                animator.SetFloat("Blend", 0.66f);
+            }
+            if (OrientationRotation == 3)
+            {
 
-            animator.SetFloat("Blend", 0.33f);
+                animator.SetFloat("Blend", 0.33f);
+            }
         }
+
+
 
     }
 

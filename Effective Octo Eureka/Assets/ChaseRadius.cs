@@ -16,12 +16,6 @@ public class ChaseRadius : MonoBehaviour
         enemyAi = transform.parent.GetComponent<EnemyAI>();
     }
 
-
-    private void Update()
-    {
-       // GetComponent<BoxCollider2D>().
-    }
-
     private void OnTriggerStay2D(Collider2D collision)
     {
         if (collision.gameObject.tag == "Player")
@@ -37,11 +31,6 @@ public class ChaseRadius : MonoBehaviour
             enemyAi.MoveToTarget(collision.gameObject);
 
         }
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-
     }
 
     private void OnTriggerExit2D(Collider2D collision)

@@ -27,6 +27,9 @@ public class PlayerData
     public bool ImmuneToBleed = false;
     public bool ImmuneToBurning = false;
 
+    public int ArmorEquipped;
+    public int WeaponEquipped;
+
     public int Gold;
 
     public List<Item> Inventory = new List<Item>();
@@ -53,6 +56,9 @@ public class PlayerData
         Inventory = player.Inventory;
 
         position = new float[3];
+
+        ArmorEquipped = player.ArmorEquipped;
+        WeaponEquipped = player.WeaponEquipped;
 
         position[0] = player.transform.position.x;
         position[1] = player.transform.position.y;

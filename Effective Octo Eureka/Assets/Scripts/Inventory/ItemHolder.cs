@@ -23,7 +23,7 @@ public class ItemHolder : MonoBehaviour
 
      int craftedID;
 
-    ItemType type;
+    public ItemType type;
 
 
     public Text type_text;
@@ -40,6 +40,8 @@ public class ItemHolder : MonoBehaviour
     public Text craftedID_text;
 
     public Text itemLevel_text;
+
+
 
 
     PlayerStats playerStats;
@@ -221,6 +223,8 @@ public class ItemHolder : MonoBehaviour
                     suffix2ID_text.text = "kills with this weapon have #% chanceto create a poison cloud";
                     break;
             }
+
+
             critChance_text.text = "Crit chance: " + critChance.ToString();
             baseDamage_text.text = "Damage: " + baseDamage.ToString();
         }
@@ -228,10 +232,112 @@ public class ItemHolder : MonoBehaviour
 
         if(type == ItemType.chest)
         {
+            switch (prefix1ID)
+            {
+                case (1):
+                    prefix1ID_text.text = "#% Increased Armor";
+                    break;
+                case (2):
+                    prefix1ID_text.text = "Immune to bleed";
+                    break;
+                case (3):
+                    prefix1ID_text.text = "take #% reduced damage from poison";
+                    break;
+                case (4):
+                    prefix1ID_text.text = "#% increased Life";
+                    break;
+                case (5):
+                    prefix1ID_text.text = "#% increased Mana";
+                    break;
+                case (6):
+                    prefix1ID_text.text = "#% recovery from flasks";
+                    break;
+                case (7):
+                    prefix1ID_text.text = "#% inscreased life and mana";
+                    break;
+            }
+
+            switch (prefix2ID)
+            {
+                case (1):
+                    prefix2ID_text.text = "#% Increased Armor";
+                    break;
+                case (2):
+                    prefix2ID_text.text = "Immune to bleed";
+                    break;
+                case (3):
+                    prefix2ID_text.text = "take #% reduced damage from poison";
+                    break;
+                case (4):
+                    prefix2ID_text.text = "#% increased Life";
+                    break;
+                case (5):
+                    prefix2ID_text.text = "#% increased Mana";
+                    break;
+                case (6):
+                    prefix2ID_text.text = "#% recovery from flasks";
+                    break;
+                case (7):
+                    prefix2ID_text.text = "#% inscreased life and mana";
+                    break;
+            }
+
+            switch (suffix1ID)
+            {
+                case (1):
+                    suffix1ID_text.text = "%# Increased movement speed";
+                    break;
+                case (2):
+                    suffix1ID_text.text = "%# Increased Attack Speed";
+                    break;
+                case (3):
+                    suffix1ID_text.text = "#% increased elemental resistance";
+                    break;
+                case (4):
+                    suffix1ID_text.text = "#% increased area of effect";
+                    break;
+                case (5):
+                    suffix1ID_text.text = "#% increased gold gained form kills";
+                    break;
+                case (6):
+                    suffix1ID_text.text = "#% increased item drop chance";
+                    break;
+                case (7):
+                    suffix1ID_text.text = "# increased item level";
+                    break;
+            }
+
+            switch (suffix2ID)
+            {
+                case (1):
+                    suffix2ID_text.text = "%# Increased movement speed";
+                    break;
+                case (2):
+                    suffix2ID_text.text = "%# Increased Attack Speed";
+                    break;
+                case (3):
+                    suffix2ID_text.text = "#% increased elemental resistance";
+                    break;
+                case (4):
+                    suffix2ID_text.text = "#% increased area of effect";
+                    break;
+                case (5):
+                    suffix2ID_text.text = "#% increased gold gained form kills";
+                    break;
+                case (6):
+                    suffix2ID_text.text = "#% increased item drop chance";
+                    break;
+                case (7):
+                    suffix2ID_text.text = "# increased item level";
+                    break;
+            }
+
+
+
             baseDamage_text.text = "Armor: " + baseDamage.ToString();
         }
 
-        itemLevel_text.text = "Item Leve: " + itemLevel.ToString();
+        itemLevel_text.text = "Item Level: " + itemLevel.ToString();
         title_text.text = title;
 
 
@@ -259,6 +365,19 @@ public class ItemHolder : MonoBehaviour
     //Delete item  -> also deletes from the Inventory DB
     public void Scrap()
     {
+
+        if (type == ItemType.chest)
+        {
+            ObjectReferences.instance.EquipImageArmor.transform.SetParent(ObjectReferences.instance.InventoryGrid.transform, false);
+            //   ObjectReferences.instance.EquipImageArmor.GetComponent<RectTransform>().position = new Vector3(50, -50, 0);
+        }
+
+        if (type == ItemType.sword)
+        {
+            ObjectReferences.instance.EquipImageWeapon.transform.SetParent(ObjectReferences.instance.InventoryGrid.transform, false);
+            //      ObjectReferences.instance.EquipImageWeapon.GetComponent<RectTransform>().position = new Vector3(50, -50, 0);
+        }
+
         playerStats.ScrapItem(id);
         Destroy(gameObject);
     }
@@ -266,6 +385,7 @@ public class ItemHolder : MonoBehaviour
     //Equip function -> Work in progress
     public void Equip()
     {
+
 
         if(type == ItemType.chest)
         {
@@ -284,5 +404,10 @@ public class ItemHolder : MonoBehaviour
         playerStats.EquipItem(i);
 
         print("Equipped: " + this.name);
+    }
+
+    public void UpdateVisualIndicators()
+    {
+
     }
 }

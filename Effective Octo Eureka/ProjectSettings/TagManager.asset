@@ -13,6 +13,8 @@ TagManager:
   - DetectionDown
   - Enemy
   - Wall
+  - VisualIndicator
+  - Path
   layers:
   - Default
   - TransparentFX

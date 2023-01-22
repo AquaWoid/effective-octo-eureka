@@ -12,13 +12,13 @@ public class PlayerStats : MonoBehaviour
     private Text[] UiText;
 
     public int level = 1;
-    public float health = 100;
+    [ShowOnly] public float health = 100;
     public float maxHealth = 100;
 
-    public float mana = 100;
+    [ShowOnly] public float mana = 100;
     public float maxMana = 100;
 
-    public int xp = 0;
+    [ShowOnly] public int xp = 0;
     public float requieredXP = 200;
 
     float lastRequiered;
@@ -26,7 +26,7 @@ public class PlayerStats : MonoBehaviour
     public float PhysicalDamage = 100;
     public float MagicalDamage = 100;
 
-    public float Defence = 10;
+    [ShowOnly] public float Defence = 10;
     public float maxDefence = 2000;
     public float damageMitigation;
 
@@ -38,7 +38,12 @@ public class PlayerStats : MonoBehaviour
     public bool ImmuneToBleed = false;
     public bool ImmuneToBurning = false;
 
+    public int ArmorEquipped;
+    public int WeaponEquipped;
+
     public int Gold;
+
+    
 
     float physCombined;
     float defCombined;
@@ -48,6 +53,7 @@ public class PlayerStats : MonoBehaviour
     int rnd;
 
     bool knockedBack = false;
+    public bool blocked = false;
 
     public List<Item> Inventory = new List<Item>();
 
@@ -61,6 +67,10 @@ public class PlayerStats : MonoBehaviour
 
     Canvas canvas;
 
+    AudioSource playerAudio;
+
+    public AudioClip swordBlock;
+
     private void Awake()
     {
         lastRequiered = requieredXP;
@@ -70,7 +80,7 @@ public class PlayerStats : MonoBehaviour
 
     private void Start()
     {
-
+        playerAudio = transform.GetComponent<AudioSource>();
         flask = GetComponent<FlaskUsage>();
 
         //HP, Mana and XP Bar initialization
@@ -113,7 +123,7 @@ public class PlayerStats : MonoBehaviour
     {
 
 
-        //Loading data from Save file 
+        //Loading data from Save file - Always keep up to date with the PlayerData script!!
 
         PlayerData data = SaveSystem.LoadPlayer();
         maxHealth = data.maxHealth;
@@ -136,13 +146,19 @@ public class PlayerStats : MonoBehaviour
         MovementSpeed = data.MovementSpeed;
         Inventory = data.Inventory;
 
-
+        ArmorEquipped = data.ArmorEquipped;
+        WeaponEquipped = data.WeaponEquipped;
 
         //Clear inventory window of any items before applying current Inventory
         foreach (Transform child in inventoryGrid.transform)
         {
             print("Scrapped: " + child.name);
-            Destroy(child.gameObject);
+
+            if(child.tag != "VisualIndicator")
+            {
+                Destroy(child.gameObject);
+            }
+
         }
 
 
@@ -157,6 +173,19 @@ public class PlayerStats : MonoBehaviour
             GameObject go = Instantiate(itemHolderGO, inventoryGrid.transform);
            // go.GetComponent<ItemHolder>().updateInventoryEntries(item);
             go.GetComponentInChildren<ItemHolder>().updateInventoryEntries(item);
+
+
+            if (item.id == ArmorEquipped)
+            {
+                ObjectReferences.instance.EquipImageArmor.transform.SetParent(go.transform, false);
+                ObjectReferences.instance.EquipImageArmor.GetComponent<Image>().enabled = true;
+            }
+
+            if (item.id == WeaponEquipped)
+            {
+                ObjectReferences.instance.EquipImageWeapon.transform.SetParent(go.transform, false);
+                ObjectReferences.instance.EquipImageWeapon.GetComponent<Image>().enabled = true;
+            }
 
             print("Applied: " + item.title + " to: " + go.name);
 
@@ -233,7 +262,7 @@ public class PlayerStats : MonoBehaviour
         UiText[10].text = "Damage Mitigation: " + damageMitigation * 100 + "%";
 
         //Level up condition
-        if (requieredXP <= 0)
+        if (xp >= requieredXP)
         {
             levelUp();
         }
@@ -259,10 +288,18 @@ public class PlayerStats : MonoBehaviour
     //Damage income function
     public void takeDamage(float damage)
     {
-        //Wood's super duper defence calculation
-        damageMitigation = (Defence / maxDefence) / 2;
-        damage = (damage - (damage * damageMitigation));
-        health -= damage;
+
+        if(blocked == false)
+        {
+            //Wood's super duper defence calculation
+            damageMitigation = (Defence / maxDefence) / 2;
+            damage = (damage - (damage * damageMitigation));
+            health -= damage;
+        } else
+        {
+            playerAudio.PlayOneShot(swordBlock);
+        }
+
 
       //  StartCoroutine(knockback());
 
@@ -453,11 +490,12 @@ public class PlayerStats : MonoBehaviour
     {
         if(item.type == ItemType.sword)
         {
-
+            WeaponEquipped = item.id;
             PhysicalDamage = item.baseDamage;
         }
         if(item.type == ItemType.chest)
         {
+            ArmorEquipped = item.id;
             Defence = item.baseDamage;
         }
 
