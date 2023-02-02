@@ -1,2 +1,2 @@
 # effective-octo-eureka
-Game project
+Game project created by Lukas aka Wood and Paul aka FloatingPyramid
